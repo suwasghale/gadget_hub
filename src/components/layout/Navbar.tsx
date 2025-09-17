@@ -66,6 +66,18 @@ const Navbar: React.FC = () => {
           items: ['11-12 inch', '13-14 inch', '15-16 inch', '17+ inch', 'Touch Screen', 'Non-Touch']
         },
         {
+          title: 'By Screen Size',
+          items: ['11-12 inch', '13-14 inch', '15-16 inch', '17+ inch', 'Touch Screen', 'Non-Touch']
+        },
+        {
+          title: 'By Screen Size',
+          items: ['11-12 inch', '13-14 inch', '15-16 inch', '17+ inch', 'Touch Screen', 'Non-Touch']
+        },
+        {
+          title: 'By Screen Size',
+          items: ['11-12 inch', '13-14 inch', '15-16 inch', '17+ inch', 'Touch Screen', 'Non-Touch']
+        },
+        {
           title: 'By Time',
           items: ['Newest', 'Oldest', 'Default', '2-in-1 Laptops', 'Student Laptops', 'Workstation Laptops']
         },
@@ -234,8 +246,8 @@ const Navbar: React.FC = () => {
             <div
               className={`grid ${
                 menuData[activeMenu].sections.length > 4
-                  ? "grid-cols-6"
-                  : "grid-cols-4"
+                  ? "grid-cols-4"
+                  : "grid-cols-2"
               } gap-8`}
             >
               {menuData[activeMenu].sections.map((section, idx) => (
