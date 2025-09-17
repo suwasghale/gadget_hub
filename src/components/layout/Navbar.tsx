@@ -156,19 +156,60 @@ const Navbar: React.FC = () => {
       title: "ACCESSORIES",
       icon: <Package className="w-5 h-5" />,
       color: "bg-orange-500",
-      sections: [{ title: "Computer Peripherals", items: ["Mice", "Keyboards"] }],
+            sections: [
+        {
+          title: 'Computer Peripherals',
+          items: ['Mice', 'Keyboards', 'Joystick/Controllers', 'Drawing Tablets', 'Webcams', 'Speakers']
+        },
+        {
+          title: 'Audio Systems',
+          items: ['Headphones/Earphones', 'Microphones', 'Speakers', 'Woofers', 'Earbuds', 'Audio Interfaces']
+        },
+        {
+          title: 'Storage Devices',
+          items: ['SSD (SATA/NVMe)', 'External SSDs', 'Internal HDDs', 'External HDDs', 'USB Pendrives', 'Memory Cards']
+        },
+      ],
     },
     office: {
       title: "HOME & OFFICE",
       icon: <Home className="w-5 h-5" />,
       color: "bg-indigo-500",
-      sections: [{ title: "Office Equipment", items: ["Printers", "Scanners"] }],
+      sections: [
+        { title: "Office Equipment", 
+          items: ["Printers", "Scanners"] },
+        {
+          title: 'Networking',
+          items: ['WiFi Routers', 'Mesh Systems', 'Network Switches', 'Ethernet Cables', 'WiFi Extenders', 'Modems']
+        },
+      ],
     },
     clearance: {
       title: "CLEARANCE SALE",
       icon: <Tag className="w-5 h-5" />,
       color: "bg-yellow-500",
-      sections: [{ title: "Hot Deals", items: ["Flash Sales", "Daily Deals"] }],
+       sections: [
+        {
+          title: 'Hot Deals',
+          items: ['Flash Sales', 'Daily Deals', 'Weekend Specials', 'Bundle Offers', 'Coupon Deals', 'Member Exclusive']
+        },
+        {
+          title: 'Clearance by Category',
+          items: ['Laptop Clearance', 'Monitor Clearance', 'Accessory Clearance', 'Gaming Clearance', 'Apple Clearance', 'Office Clearance']
+        },
+        {
+          title: 'Open Box',
+          items: ['Open Box Laptops', 'Open Box Monitors', 'Open Box PCs', 'Customer Returns', 'Display Models', 'Refurbished Items']
+        },
+        {
+          title: 'Last Stock',
+          items: ['Discontinued Models', 'End of Line', 'Limited Quantity', 'Previous Gen', 'Seasonal Clearance', 'Overstock Items']
+        },
+        {
+          title: 'Last Stock',
+          items: ['Discontinued Models', 'End of Line', 'Limited Quantity', 'Previous Gen', 'Seasonal Clearance', 'Overstock Items']
+        },
+      ]
     },
   };
 
@@ -245,9 +286,9 @@ const Navbar: React.FC = () => {
           <div className="container mx-auto px-4 py-8">
             <div
               className={`grid ${
-                menuData[activeMenu].sections.length > 4
+                menuData[activeMenu].sections.length > 3
                   ? "grid-cols-4"
-                  : "grid-cols-2"
+                  : "grid-cols-3"
               } gap-8`}
             >
               {menuData[activeMenu].sections.map((section, idx) => (
