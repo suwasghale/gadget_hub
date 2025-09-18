@@ -231,7 +231,7 @@ const Navbar: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="text-2xl font-bold text-gray-800">TechStore</div>
+            <div className="text-2xl font-bold text-gray-800 block lg:hidden">Gadget Hub</div>
 
             {/* Mobile Menu Button */}
             <button
@@ -291,6 +291,7 @@ const Navbar: React.FC = () => {
                   : "grid-cols-3"
               } gap-8`}
             >
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:auto-fit gap-8"> */}
               {menuData[activeMenu].sections.map((section, idx) => (
                 <div key={idx} className="space-y-3">
                   <h3 className="font-semibold text-gray-900 text-sm uppercase border-b pb-2">

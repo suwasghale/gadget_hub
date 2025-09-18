@@ -17,7 +17,7 @@ export const menuData: MenuData = {
 
    laptops: {
       title: "LAPTOPS",
-      icon: <Laptop className="w-5 h-5" />,
+      icon: Laptop ,
       color: "bg-blue-500",
       sections: [
         {
@@ -56,7 +56,7 @@ export const menuData: MenuData = {
     },
     apple: {
       title: "APPLE",
-      icon: <Apple className="w-5 h-5" />,
+      icon: Apple,
       color: "bg-gray-800",
       sections: [
         {
@@ -79,7 +79,7 @@ export const menuData: MenuData = {
     },
     monitors: {
       title: "MONITORS",
-      icon: <Monitor className="w-5 h-5" />,
+      icon: Monitor,
       color: "bg-purple-500",
         sections: [
         {
@@ -102,7 +102,7 @@ export const menuData: MenuData = {
     },
     gaming: {
       title: "GAMER'S ZONE",
-      icon: <Gamepad2 className="w-5 h-5" />,
+      icon: Gamepad2,
       color: "bg-red-500",
       sections: [
         {
@@ -125,7 +125,7 @@ export const menuData: MenuData = {
         },
     accessories: {
       title: "ACCESSORIES",
-      icon: <Package className="w-5 h-5" />,
+      icon: Package,
       color: "bg-orange-500",
       sections: [
         {
@@ -144,7 +144,7 @@ export const menuData: MenuData = {
     },
     office: {
       title: "HOME & OFFICE",
-      icon: <Home className="w-5 h-5" />,
+      icon: Home,
       color: "bg-indigo-500",
       sections: [
         { title: "Office Equipment", 
@@ -157,7 +157,7 @@ export const menuData: MenuData = {
     },
     clearance: {
       title: "CLEARANCE SALE",
-      icon: <Tag className="w-5 h-5" />,
+      icon: Tag ,
       color: "bg-yellow-500",
        sections: [
         {
