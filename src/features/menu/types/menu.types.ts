@@ -11,6 +11,7 @@ export interface MenuItem {
   icon: LucideIcon | ReactNode;
   color: string;
   sections: Section[];
+  subMenus?: Record<string, MenuItem>; // optional nested menus
 }
 
 export type MenuData = Record<string, MenuItem>;

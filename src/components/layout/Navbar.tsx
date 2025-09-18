@@ -132,7 +132,7 @@ const Navbar: React.FC = () => {
     gaming: {
       title: "GAMER'S ZONE",
       icon: <Gamepad2 className="w-5 h-5" />,
-      color: "bg-red-500",
+      color: "bg-pink-500",
       sections: [
         {
           title: 'Gaming Peripherals',
@@ -226,7 +226,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg relative z-50">
+    <nav className="bg-red-600 shadow-lg relative z-50">
       <div className="border-b">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -258,7 +258,7 @@ const Navbar: React.FC = () => {
                     className={`px-4 py-6 text-sm font-medium flex items-center space-x-1 transition-colors duration-200 ${
                       activeMenu === key
                         ? `${menu.color} text-white`
-                        : "text-gray-700 hover:text-gray-900"
+                        : "text-gray-100 hover:text-gray-900"
                     }`}
                   >
                     {menu.icon}
@@ -294,7 +294,7 @@ const Navbar: React.FC = () => {
             {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:auto-fit gap-8"> */}
               {menuData[activeMenu].sections.map((section, idx) => (
                 <div key={idx} className="space-y-3">
-                  <h3 className="font-semibold text-gray-900 text-sm uppercase border-b pb-2">
+                  <h3 className="font-semibold text-red-900 text-sm uppercase border-b pb-2">
                     {section.title}
                   </h3>
                   <ul className="space-y-2">

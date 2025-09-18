@@ -1,7 +1,4 @@
 import {
-  ChevronDown,
-  Menu,
-  X,
   Laptop,
   Monitor,
   Gamepad2,
@@ -9,7 +6,6 @@ import {
   Home,
   Tag,
   Apple,
-  Cpu,
 } from "lucide-react";
 import { MenuData } from "../types/menu.types";
 

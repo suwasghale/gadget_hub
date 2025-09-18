@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import Navbar from './Navbar';
 
 const Header = () => {
   const [cartItems, setCartItems] = useState([
@@ -294,23 +295,9 @@ const Header = () => {
       </header>
 
       {/* Navigation */}
-      <nav className="bg-red-600 text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex overflow-x-auto">
-            {navItems.map((item, index) => (
-              <Button
-                key={item}
-                variant="ghost"
-                className={`text-white hover:bg-white/10 rounded-none border-b-2 border-transparent hover:border-yellow-400 whitespace-nowrap ${
-                  index === 0 ? 'border-yellow-400' : ''
-                }`}
-              >
-                {item}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </nav>
+      <div className="bg-red-600 text-white">
+        <Navbar/>
+      </div>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-amber-900 to-orange-700 text-white py-16">
