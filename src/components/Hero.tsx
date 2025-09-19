@@ -9,19 +9,19 @@ export default function HeroSection() {
       title: "Summer Collection 2024",
       desc: "Discover the latest trends with up to 50% off",
       btn: "Shop Now",
-      bg: "linear-gradient(135deg, rgba(102,126,234,0.8), rgba(118,75,162,0.8)), url('data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 1200 600\\"><rect fill=\\"%23667eea\\" width=\\"1200\\" height=\\"600\\"/><path fill=\\"%23764ba2\\" d=\\"M0 300L50 325L100 300L150 275L200 300L250 325L300 300L350 275L400 300L450 325L500 300L550 275L600 300L650 325L700 300L750 275L800 300L850 325L900 300L950 275L1000 300L1050 325L1100 300L1150 275L1200 300V600H0V300Z\\"/></svg>')",
+      bg: `linear-gradient(135deg, rgba(102,126,234,0.8), rgba(118,75,162,0.8)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'><rect fill='%23667eea' width='1200' height='600'/><path fill='%23764ba2' d='M0 300L50 325L100 300L150 275L200 300L250 325L300 300L350 275L400 300L450 325L500 300L550 275L600 300L650 325L700 300L750 275L800 300L850 325L900 300L950 275L1000 300L1050 325L1100 300L1150 275L1200 300V600H0V300Z'/></svg>")`,
     },
     {
       title: "Exclusive Deals",
       desc: "Limited time offers on premium products",
       btn: "View Deals",
-      bg: "linear-gradient(135deg, rgba(240,147,251,0.8), rgba(245,87,108,0.8)), url('data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 1200 600\\"><rect fill=\\"%23f093fb\\" width=\\"1200\\" height=\\"600\\"/><circle fill=\\"%23f5576c\\" cx=\\"600\\" cy=\\"300\\" r=\\"200\\"/></svg>')",
+      bg: `linear-gradient(135deg, rgba(240,147,251,0.8), rgba(245,87,108,0.8)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'><rect fill='%23f093fb' width='1200' height='600'/><circle fill='%23f5576c' cx='600' cy='300' r='200'/></svg>")`,
     },
     {
       title: "New Arrivals",
       desc: "Be the first to explore our latest collection",
       btn: "Explore",
-      bg: "linear-gradient(135deg, rgba(79,172,254,0.8), rgba(0,242,254,0.8)), url('data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 1200 600\\"><rect fill=\\"%234facfe\\" width=\\"1200\\" height=\\"600\\"/><rect fill=\\"%2300f2fe\\" x=\\"300\\" y=\\"150\\" width=\\"600\\" height=\\"300\\"/></svg>')",
+      bg: `linear-gradient(135deg, rgba(79,172,254,0.8), rgba(0,242,254,0.8)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'><rect fill='%234facfe' width='1200' height='600'/><rect fill='%2300f2fe' x='300' y='150' width='600' height='300'/></svg>")`,
     },
   ];
 
@@ -129,7 +129,7 @@ export default function HeroSection() {
             <a href="#" className="cta-button inline-block px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-pink-400 to-red-400 shadow-md hover:-translate-y-1 hover:shadow-xl transition">Shop Flash Sale</a>
             <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition">
               <h3 className="text-lg">Limited Time</h3>
-              <p className="text-sm opacity-80">Don't miss out on these incredible deals</p>
+              <p className="text-sm opacity-80">Do not miss out on these incredible deals</p>
             </div>
           </div>
 
