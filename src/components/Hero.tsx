@@ -1,165 +1,440 @@
 "use client";
+import React, { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { useEffect, useRef, useState } from "react";
+interface CarouselSlide {
+  id: number;
+  title: string;
+  description: string;
+  ctaText: string;
+  gradient: string;
+  backgroundPattern: string;
+}
 
-export default function HeroSection() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [
+interface PhotoSection {
+  title: string;
+  description: string;
+  ctaText?: string;
+  overlayTitle: string;
+  overlayDescription: string;
+  gradient: string;
+}
+
+const HeroSection: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+
+  const carouselSlides: CarouselSlide[] = [
     {
+      id: 1,
       title: "Summer Collection 2024",
-      desc: "Discover the latest trends with up to 50% off",
-      btn: "Shop Now",
-      bg: `linear-gradient(135deg, rgba(102,126,234,0.8), rgba(118,75,162,0.8)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'><rect fill='%23667eea' width='1200' height='600'/><path fill='%23764ba2' d='M0 300L50 325L100 300L150 275L200 300L250 325L300 300L350 275L400 300L450 325L500 300L550 275L600 300L650 325L700 300L750 275L800 300L850 325L900 300L950 275L1000 300L1050 325L1100 300L1150 275L1200 300V600H0V300Z'/></svg>")`,
+      description: "Discover the latest trends with up to 50% off",
+      ctaText: "Shop Now",
+
     },
     {
+      id: 2,
       title: "Exclusive Deals",
-      desc: "Limited time offers on premium products",
-      btn: "View Deals",
-      bg: `linear-gradient(135deg, rgba(240,147,251,0.8), rgba(245,87,108,0.8)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'><rect fill='%23f093fb' width='1200' height='600'/><circle fill='%23f5576c' cx='600' cy='300' r='200'/></svg>")`,
+      description: "Limited time offers on premium products",
+      ctaText: "View Deals",
+
     },
     {
+      id: 3,
       title: "New Arrivals",
-      desc: "Be the first to explore our latest collection",
-      btn: "Explore",
-      bg: `linear-gradient(135deg, rgba(79,172,254,0.8), rgba(0,242,254,0.8)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'><rect fill='%234facfe' width='1200' height='600'/><rect fill='%2300f2fe' x='300' y='150' width='600' height='300'/></svg>")`,
-    },
+      description: "Be the first to explore our latest collection",
+      ctaText: "Explore",
+
+    }
   ];
 
-  const heroRef = useRef<HTMLDivElement>(null);
+  const photoSections: Record<string, PhotoSection> = {
+    flashSale: {
+      title: "Flash Sale",
+      description: "24 Hours Only",
+      ctaText: "Shop Flash Sale",
+      overlayTitle: "Limited Time",
+      overlayDescription: "Don't miss out on these incredible deals",
 
-  const changeSlide = (dir: number) => {
-    setCurrentSlide((prev) => (prev + dir + slides.length) % slides.length);
+    },
+    premium: {
+      title: "Premium Quality",
+      description: "Handcrafted with care and attention to detail",
+      ctaText: "Learn More",
+      overlayTitle: "Craftsmanship",
+      overlayDescription: "Every product tells a story",
+
+    },
+    trending: {
+      title: "Trending",
+      description: "Hot picks this week",
+      overlayTitle: "Most Popular",
+      overlayDescription: "Customer favorites",
+
+    },
+    members: {
+      title: "Members Only",
+      description: "Exclusive benefits",
+      overlayTitle: "Join Today",
+      overlayDescription: "Get special discounts",
+
+    },
+    shipping: {
+      title: "Free Shipping Worldwide",
+      description: "On orders over $100. No hidden fees, delivered to your door.",
+      ctaText: "Start Shopping",
+      overlayTitle: "Global Delivery",
+      overlayDescription: "We ship to over 100 countries",
+
+    }
   };
 
+  const changeSlide = useCallback((direction: number) => {
+    setCurrentSlide(prev => {
+      const newSlide = prev + direction;
+      if (newSlide < 0) return carouselSlides.length - 1;
+      if (newSlide >= carouselSlides.length) return 0;
+      return newSlide;
+    });
+  }, [carouselSlides.length]);
+
+  const goToSlide = useCallback((index: number) => {
+    setCurrentSlide(index);
+  }, []);
+
   useEffect(() => {
-    const interval = setInterval(() => changeSlide(1), 5000);
+    const interval = setInterval(() => {
+      changeSlide(1);
+    }, 5000);
+
     return () => clearInterval(interval);
+  }, [changeSlide]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    setMousePosition({ x, y });
   }, []);
 
-  // Parallax effect
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      if (!heroRef.current) return;
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
-      heroRef.current.style.transform = `perspective(1000px) rotateY(${(x - 0.5) * 2}deg) rotateX(${(y - 0.5) * -2}deg)`;
-    };
-
-    const reset = () => {
-      if (heroRef.current)
-        heroRef.current.style.transform = "perspective(1000px) rotateY(0) rotateX(0)";
-    };
-
-    document.addEventListener("mousemove", handleMove);
-    heroRef.current?.addEventListener("mouseleave", reset);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMove);
-      heroRef.current?.removeEventListener("mouseleave", reset);
-    };
+  const handleMouseLeave = useCallback(() => {
+    setMousePosition({ x: 0.5, y: 0.5 });
   }, []);
+
+  // const parallaxStyle = {
+  //   transform: `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 2}deg) rotateX(${(mousePosition.y - 0.5) * -2}deg)`,
+  //   transition: 'transform 0.3s ease-out'
+  // };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-700 p-5 font-sans">
-      <div
-        ref={heroRef}
-        className="max-w-[1400px] mx-auto bg-white/10 backdrop-blur-lg rounded-2xl p-5 shadow-2xl"
+    <div className="min-h-screen ">
+      <div 
+        className="max-w-7xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl p-5 shadow-2xl"
+        // style={parallaxStyle}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
-        <div className="grid grid-cols-3 grid-rows-[repeat(3,280px)] gap-5 lg:h-[900px] md:grid-cols-2 md:grid-rows-[repeat(4,250px)] md:auto-rows-[250px] sm:grid-cols-1 sm:grid-rows-[repeat(6,250px)]">
-          {/* Carousel */}
-          <div className="relative col-span-2 row-span-1 rounded-xl overflow-hidden bg-gradient-to-br from-indigo-400 to-purple-700">
-            <div
-              className="flex h-full transition-transform duration-500"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        {/* Desktop Grid */}
+        <div className="hidden lg:grid lg:grid-cols-3 lg:grid-rows-3 gap-5 h-[900px]">
+          {/* Carousel Section (Row 1, Cols 1-2) */}
+          <div className="col-span-2 row-span-1 relative overflow-hidden rounded-2xl group">
+            <div 
+              className="flex h-full transition-transform duration-500 ease-in-out"
+              // style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-              {slides.map((s, i) => (
-                <div
-                  key={i}
-                  className="min-w-full h-full flex items-center justify-center bg-cover bg-center relative text-white"
-                  style={{ backgroundImage: s.bg }}
+              {carouselSlides.map((slide, index) => (
+                <div 
+                  key={slide.id}
+                  className={`min-w-full h-full bg-gradient-to-r ${slide.gradient} flex items-center justify-center relative`}
                 >
-                  <div className="text-center z-10 p-8 bg-black/40 rounded-lg backdrop-blur-sm animate-fadeIn">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-slideInDown">
-                      {s.title}
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="text-center z-10 p-8 bg-black/40 rounded-xl backdrop-blur-sm animate-fade-in">
+                    <h2 className="text-4xl font-bold text-white mb-4 animate-slide-down">
+                      {slide.title}
                     </h2>
-                    <p className="text-lg mb-6 animate-slideInUp">{s.desc}</p>
-                    <a
-                      href="#"
-                      className="inline-block px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-pink-400 to-red-400 shadow-md hover:-translate-y-1 hover:shadow-xl transition"
-                    >
-                      {s.btn}
-                    </a>
+                    <p className="text-xl text-white/90 mb-6 animate-slide-up">
+                      {slide.description}
+                    </p>
+                    <button className="px-8 py-3 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-full hover:scale-105 hover:shadow-xl transition-all duration-300 animate-fade-in-delayed">
+                      {slide.ctaText}
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-            {/* Navigation */}
-            <button
+            
+            {/* Navigation Arrows */}
+            <button aria-label='previous slide'
               onClick={() => changeSlide(-1)}
-              className="absolute top-1/2 left-5 -translate-y-1/2 bg-white/20 text-white p-4 rounded-full hover:bg-white/30"
+              className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all duration-300 z-20"
             >
-              ❮
+              <ChevronLeft className="w-6 h-6" />
             </button>
-            <button
+            <button 
+              aria-label='next slide'
               onClick={() => changeSlide(1)}
-              className="absolute top-1/2 right-5 -translate-y-1/2 bg-white/20 text-white p-4 rounded-full hover:bg-white/30"
+              className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all duration-300 z-20"
             >
-              ❯
+              <ChevronRight className="w-6 h-6" />
             </button>
+            
             {/* Indicators */}
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-              {slides.map((_, i) => (
-                <span
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className={`cursor-pointer transition-all h-3 rounded-full ${
-                    currentSlide === i
-                      ? "bg-white w-8"
-                      : "bg-white/50 w-3"
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+              {carouselSlides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlide 
+                      ? 'w-8 bg-white' 
+                      : 'w-3 bg-white/50 hover:bg-white/70'
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* Flash Sale */}
-          <div className="photo-section relative rounded-xl overflow-hidden cursor-pointer col-span-1 row-span-1 bg-gradient-to-br from-pink-400 via-yellow-300 to-yellow-200 flex flex-col items-center justify-center text-center text-white p-8 transition-transform hover:scale-[1.02] hover:shadow-2xl">
-            <h2 className="text-2xl mb-2">Flash Sale</h2>
-            <p className="mb-4">24 Hours Only</p>
-            <a href="#" className="cta-button inline-block px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-pink-400 to-red-400 shadow-md hover:-translate-y-1 hover:shadow-xl transition">Shop Flash Sale</a>
-            <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition">
-              <h3 className="text-lg">Limited Time</h3>
-              <p className="text-sm opacity-80">Do not miss out on these incredible deals</p>
+          {/* Flash Sale Section (Row 1, Col 3) */}
+          <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.flashSale.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}>
+            <div className="h-full flex flex-col items-center justify-center text-center text-white p-8 relative z-10">
+              <h2 className="text-3xl font-bold mb-3">{photoSections.flashSale.title}</h2>
+              <p className="text-lg mb-6 opacity-90">{photoSections.flashSale.description}</p>
+              <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-full hover:scale-105 transition-all duration-300">
+                {photoSections.flashSale.ctaText}
+              </button>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 to-transparent text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <h3 className="text-lg font-semibold mb-1">{photoSections.flashSale.overlayTitle}</h3>
+              <p className="text-sm opacity-90">{photoSections.flashSale.overlayDescription}</p>
             </div>
           </div>
 
-          {/* Premium Quality */}
-          <div className="photo-section relative rounded-xl overflow-hidden col-span-1 row-span-2 bg-gradient-to-br from-teal-200 to-pink-200 flex flex-col items-center justify-center text-center text-white p-10">
-            <h2 className="text-3xl mb-4">Premium Quality</h2>
-            <p className="max-w-sm mb-6">Handcrafted with care and attention to detail</p>
-            <a href="#" className="cta-button inline-block px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-pink-400 to-red-400 shadow-md hover:-translate-y-1 hover:shadow-xl transition">Learn More</a>
+          {/* Premium Quality Section (Rows 2-3, Col 1) */}
+          <div className={`row-span-2 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.premium.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}>
+            <div className="h-full flex flex-col items-center justify-center text-center text-white p-10 relative z-10">
+              <h2 className="text-4xl font-bold mb-4">{photoSections.premium.title}</h2>
+              <p className="text-lg mb-8 opacity-90 max-w-md leading-relaxed">{photoSections.premium.description}</p>
+              <button className="px-8 py-3 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-full hover:scale-105 transition-all duration-300">
+                {photoSections.premium.ctaText}
+              </button>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 to-transparent text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <h3 className="text-lg font-semibold mb-1">{photoSections.premium.overlayTitle}</h3>
+              <p className="text-sm opacity-90">{photoSections.premium.overlayDescription}</p>
+            </div>
           </div>
 
-          {/* Trending */}
-          <div className="photo-section relative rounded-xl overflow-hidden col-span-1 bg-gradient-to-br from-orange-100 to-orange-300 flex flex-col items-center justify-center text-center text-white p-8">
-            <h2 className="text-2xl mb-2">Trending</h2>
-            <p>Hot picks this week</p>
+          {/* Trending Section (Row 2, Col 2) */}
+          <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.trending.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}>
+            <div className="h-full flex flex-col items-center justify-center text-center text-white p-8 relative z-10">
+              <h2 className="text-2xl font-bold mb-3">{photoSections.trending.title}</h2>
+              <p className="text-base opacity-90">{photoSections.trending.description}</p>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 to-transparent text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <h3 className="text-lg font-semibold mb-1">{photoSections.trending.overlayTitle}</h3>
+              <p className="text-sm opacity-90">{photoSections.trending.overlayDescription}</p>
+            </div>
           </div>
 
-          {/* Members Only */}
-          <div className="photo-section relative rounded-xl overflow-hidden col-span-1 bg-gradient-to-br from-pink-300 to-pink-100 flex flex-col items-center justify-center text-center text-white p-8">
-            <h2 className="text-2xl mb-2">Members Only</h2>
-            <p>Exclusive benefits</p>
+          {/* Members Only Section (Row 2, Col 3) */}
+          <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.members.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}>
+            <div className="h-full flex flex-col items-center justify-center text-center text-white p-8 relative z-10">
+              <h2 className="text-2xl font-bold mb-3">{photoSections.members.title}</h2>
+              <p className="text-base opacity-90">{photoSections.members.description}</p>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 to-transparent text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <h3 className="text-lg font-semibold mb-1">{photoSections.members.overlayTitle}</h3>
+              <p className="text-sm opacity-90">{photoSections.members.overlayDescription}</p>
+            </div>
           </div>
 
-          {/* Free Shipping */}
-          <div className="photo-section relative rounded-xl overflow-hidden col-span-2 bg-gradient-to-br from-blue-400 to-cyan-400 flex flex-col items-center justify-center text-center text-white p-10">
-            <h2 className="text-3xl mb-4">Free Shipping Worldwide</h2>
-            <p className="max-w-md mb-6">On orders over $100. No hidden fees, delivered to your door.</p>
-            <a href="#" className="cta-button inline-block px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-pink-400 to-red-400 shadow-md hover:-translate-y-1 hover:shadow-xl transition">Start Shopping</a>
+          {/* Free Shipping Section (Row 3, Cols 2-3) */}
+          <div className={`col-span-2 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.shipping.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}>
+            <div className="h-full flex flex-col items-center justify-center text-center text-white p-10 relative z-10">
+              <h2 className="text-3xl font-bold mb-4">{photoSections.shipping.title}</h2>
+              <p className="text-lg mb-8 opacity-90 max-w-2xl leading-relaxed">{photoSections.shipping.description}</p>
+              <button className="px-8 py-3 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-full hover:scale-105 transition-all duration-300">
+                {photoSections.shipping.ctaText}
+              </button>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 to-transparent text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <h3 className="text-lg font-semibold mb-1">{photoSections.shipping.overlayTitle}</h3>
+              <p className="text-sm opacity-90">{photoSections.shipping.overlayDescription}</p>
+            </div>
           </div>
         </div>
+
+        {/* Tablet Layout */}
+        <div className="hidden md:grid lg:hidden md:grid-cols-2 gap-5 space-y-0">
+          {/* Carousel - Full width */}
+          <div className="col-span-2 h-64 relative overflow-hidden rounded-2xl group">
+            <div 
+              className="flex h-full transition-transform duration-500 ease-in-out"
+              // style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {carouselSlides.map((slide) => (
+                <div 
+                  key={slide.id}
+                  className={`min-w-full h-full bg-gradient-to-r ${slide.gradient} flex items-center justify-center relative`}
+                >
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="text-center z-10 p-6 bg-black/40 rounded-xl backdrop-blur-sm">
+                    <h2 className="text-3xl font-bold text-white mb-3">{slide.title}</h2>
+                    <p className="text-lg text-white/90 mb-4">{slide.description}</p>
+                    <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-full hover:scale-105 transition-all duration-300">
+                      {slide.ctaText}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button aria-label='previous slide' onClick={() => changeSlide(-1)} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 z-20">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button aria-label='next slide' onClick={() => changeSlide(1)} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 z-20">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              {carouselSlides.map((_, index) => (
+                <button key={index} onClick={() => goToSlide(index)} className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'w-6 bg-white' : 'w-2 bg-white/50'}`} />
+              ))}
+            </div>
+          </div>
+
+          {/* Other sections */}
+          <div className={`col-span-2 h-48 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.flashSale.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02]`}>
+            <div className="h-full flex items-center justify-center text-center text-white p-6">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">{photoSections.flashSale.title}</h2>
+                <p className="text-base mb-4">{photoSections.flashSale.description}</p>
+                <button className="px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full font-semibold">{photoSections.flashSale.ctaText}</button>
+              </div>
+            </div>
+          </div>
+
+          <div className={`row-span-2 h-96 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.premium.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02]`}>
+            <div className="h-full flex items-center justify-center text-center text-white p-8">
+              <div>
+                <h2 className="text-3xl font-bold mb-4">{photoSections.premium.title}</h2>
+                <p className="text-lg mb-6">{photoSections.premium.description}</p>
+                <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-red-500 rounded-full font-semibold">{photoSections.premium.ctaText}</button>
+              </div>
+            </div>
+          </div>
+
+          <div className={`h-48 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.trending.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02]`}>
+            <div className="h-full flex items-center justify-center text-center text-white p-6">
+              <div>
+                <h2 className="text-xl font-bold mb-2">{photoSections.trending.title}</h2>
+                <p className="text-base">{photoSections.trending.description}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className={`h-48 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.members.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02]`}>
+            <div className="h-full flex items-center justify-center text-center text-white p-6">
+              <div>
+                <h2 className="text-xl font-bold mb-2">{photoSections.members.title}</h2>
+                <p className="text-base">{photoSections.members.description}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className={`col-span-2 h-48 relative rounded-2xl overflow-hidden bg-gradient-to-br ${photoSections.shipping.gradient} group cursor-pointer transition-all duration-300 hover:scale-[1.02]`}>
+            <div className="h-full flex items-center justify-center text-center text-white p-8">
+              <div>
+                <h2 className="text-2xl font-bold mb-4">{photoSections.shipping.title}</h2>
+                <p className="text-lg mb-4">{photoSections.shipping.description}</p>
+                <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-red-500 rounded-full font-semibold">{photoSections.shipping.ctaText}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Layout */}
+        <div className="md:hidden space-y-5">
+          {/* Carousel */}
+          <div className="h-64 relative overflow-hidden rounded-2xl group">
+            <div 
+              className="flex h-full transition-transform duration-500 ease-in-out"
+              // style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {carouselSlides.map((slide) => (
+                <div 
+                  key={slide.id}
+                  className={`min-w-full h-full bg-gradient-to-r ${slide.gradient} flex items-center justify-center relative`}
+                >
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="text-center z-10 p-4 bg-black/40 rounded-xl backdrop-blur-sm">
+                    <h2 className="text-2xl font-bold text-white mb-2">{slide.title}</h2>
+                    <p className="text-base text-white/90 mb-4">{slide.description}</p>
+                    <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-full text-sm">
+                      {slide.ctaText}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => changeSlide(-1)} aria-label='previous slide' className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/20 text-white p-2 rounded-full">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button onClick={() => changeSlide(1)} aria-label='next slide' className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/20 text-white p-2 rounded-full">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
+              {carouselSlides.map((_, index) => (
+                <button key={index} onClick={() => goToSlide(index)} className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'w-4 bg-white' : 'w-2 bg-white/50'}`} />
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile sections */}
+          {Object.entries(photoSections).map(([key, section]) => (
+            <div key={key} className={`h-48 relative rounded-2xl overflow-hidden bg-gradient-to-br ${section.gradient} group cursor-pointer`}>
+              <div className="h-full flex items-center justify-center text-center text-white p-6">
+                <div>
+                  <h2 className="text-xl font-bold mb-2">{section.title}</h2>
+                  <p className="text-sm mb-4 opacity-90">{section.description}</p>
+                  {section.ctaText && (
+                    <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full font-semibold text-sm">
+                      {section.ctaText}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slide-down {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 1s ease-out;
+        }
+        .animate-fade-in-delayed {
+          animation: fade-in 1s ease-out 0.3s both;
+        }
+        .animate-slide-down {
+          animation: slide-down 0.8s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out 0.2s both;
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default HeroSection;
