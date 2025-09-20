@@ -273,35 +273,36 @@ const Category: React.FC = () => {
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-9 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
           {categories.map((category) => (
             <div
               key={category.id}
-              className="group relative bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all duration-500 cursor-pointer transform hover:-translate-y-2 hover:scale-105"
+              className="group relative bg-white rounded-2xl p-6  transition-all duration-500 cursor-pointer transform hover:-translate-y-2 hover:scale-105"
             >
+                {/* shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-200 */}
               {/* Gradient Background on Hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              {/* <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div> */}
               
               {/* Content */}
               <div className="relative z-10 flex flex-col items-center text-center space-y-4">
                 {/* Icon Container */}
                 <div className="relative">
-                  <div className="w-16 h-16 flex items-center justify-center text-gray-400 group-hover:text-blue-600 transition-colors duration-300">
+                  <div className="w-16 h-16 flex items-center justify-center text-gray-400 group-hover:text-red-600 transition-colors duration-300">
                     {category.icon}
                   </div>
                   {/* Animated Ring on Hover */}
-                  <div className="absolute inset-0 rounded-full border-2 border-blue-600 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-500"></div>
+                  {/* <div className="absolute inset-0 rounded-full border-2 border-blue-600 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-500"></div> */}
                 </div>
 
                 {/* Category Name */}
                 <div className="space-y-1">
-                  <h3 className="font-semibold text-gray-900 text-sm lg:text-base group-hover:text-blue-900 transition-colors duration-300">
+                  <h3 className="font-semibold text-gray-900 text-sm lg:text-base group-hover:text-red-900 transition-colors duration-300">
                     {category.name}
                   </h3>
                   
                   {/* Product Count */}
                   {category.count && (
-                    <p className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-300">
+                    <p className="text-xs text-gray-500 group-hover:text-red-600 transition-colors duration-300">
                       {category.count.toLocaleString()} items
                     </p>
                   )}
@@ -309,27 +310,27 @@ const Category: React.FC = () => {
 
                 {/* Hover Arrow */}
                 <div className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </div>
               </div>
 
               {/* Subtle Border Glow on Hover */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
+              {/* <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div> */}
             </div>
           ))}
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-16">
+        {/* <div className="text-center mt-16">
           <button className="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
             <span>View All Categories</span>
             <svg className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </button>
-        </div>
+        </div> */}
       </div>
     </section>
   );
