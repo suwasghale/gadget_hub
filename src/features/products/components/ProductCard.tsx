@@ -1,24 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Heart, ShoppingCart, Clock, Eye, Star } from "lucide-react";
-import type { Product } from "./types/product"; // <-- reuse your shared type
+import type { Product } from "@/features/products/types";
 
-interface ProductCardProps {
-  product: Product;
-}
-
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard = ({ product }: { product: Product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const formatPrice = (price: number) => `₹ ${price.toLocaleString("en-IN")}.00`;
+  const formatPrice = (price: number) =>
+    `₹ ${price.toLocaleString("en-IN")}.00`;
 
-  const renderActionButton = () => {
+  const getStatusButton = () => {
     switch (product.status) {
       case "in-stock":
         return (
-          <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+          <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-sm">
             <ShoppingCart className="w-4 h-4" />
             <span>Add to Cart</span>
           </button>
@@ -27,14 +25,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         return (
           <button
             disabled
-            className="w-full bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg cursor-not-allowed opacity-70"
+            className="w-full bg-gray-400 text-white font-semibold py-2.5 px-3 rounded-lg cursor-not-allowed opacity-70 text-sm"
           >
             Out of Stock
           </button>
         );
       case "coming-soon":
         return (
-          <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2">
+          <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 px-3 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 text-sm">
             <Clock className="w-4 h-4" />
             <span>Coming Soon</span>
           </button>
@@ -44,78 +42,81 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div
-      className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-red-200 group relative"
+      className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-red-200 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Section */}
-      <div className="relative overflow-hidden bg-gray-50 p-4">
+      {/* Product Image Section */}
+      <div className="relative h-56 md:h-64 bg-gray-50">
+        {/* Badges */}
         {product.isNew && (
-          <div className="absolute top-3 left-3 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+          <div className="absolute top-2 left-2 bg-green-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold z-10">
             NEW
           </div>
         )}
-
-        {product.discount && product.discount > 0 && (
-          <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-            SAVE {product.discount}%
+        {product.discount > 0 && (
+          <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold z-10">
+            -{product.discount}%
           </div>
         )}
 
         {/* Wishlist Button */}
         <button
           onClick={() => setIsWishlisted(!isWishlisted)}
-          className={`absolute top-12 right-3 p-2 rounded-full transition-all duration-300 z-10 ${
+          className={`absolute top-10 right-2 p-1.5 rounded-full transition-all duration-300 z-10 ${
             isWishlisted
               ? "bg-red-600 text-white hover:bg-red-700"
               : "bg-white text-gray-600 hover:bg-red-50 hover:text-red-600"
-          } shadow-lg hover:shadow-xl hover:scale-110`}
+          } shadow hover:shadow-md`}
         >
           <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
         </button>
 
         {/* Quick View */}
         <button
-          aria-label="Quick View"
-          className={`absolute bottom-3 right-3 p-2 rounded-full bg-white text-gray-600 hover:bg-red-50 hover:text-red-600 shadow-lg transition-all duration-300 z-10 ${
+          aria-label="quick view button"
+          className={`absolute bottom-2 right-2 p-1.5 rounded-full bg-white text-gray-600 hover:bg-red-50 hover:text-red-600 shadow transition-all duration-300 z-10 ${
             isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
           <Eye className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center justify-center">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
-          />
-        </div>
+        {/* Next.js Optimized Image */}
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 768px) 100vw,
+                 (max-width: 1200px) 50vw,
+                 25vw"
+          className="object-cover p-4 transition-transform duration-300 group-hover:scale-105"
+          priority={product.isNew}
+        />
       </div>
 
-      {/* Details Section */}
-      <div className="p-5 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-red-600 transition-colors duration-300 leading-tight">
+      {/* Product Details */}
+      <div className="p-4 space-y-2">
+        {/* Product Name */}
+        <h3 className="text-sm font-medium text-gray-900 line-clamp-2 hover:text-red-600 transition-colors duration-300">
           {product.name}
         </h3>
 
         {/* Rating */}
         {product.rating && (
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < Math.floor(product.rating!)
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
+          <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-3.5 h-3.5 ${
+                  i < Math.floor(product.rating!)
+                    ? "text-yellow-400 fill-current"
+                    : "text-gray-300"
+                }`}
+              />
+            ))}
             {product.reviewCount && (
-              <span className="text-sm text-gray-500">
+              <span className="text-xs text-gray-500">
                 ({product.reviewCount})
               </span>
             )}
@@ -123,54 +124,37 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
 
         {/* Pricing */}
-        <div className="space-y-2">
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl font-bold text-gray-900">
+        <div>
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-bold text-gray-900">
               {formatPrice(product.currentPrice)}
             </span>
             {product.originalPrice > product.currentPrice && (
-              <span className="text-lg text-gray-500 line-through">
+              <span className="text-sm text-gray-500 line-through">
                 {formatPrice(product.originalPrice)}
               </span>
             )}
           </div>
 
           {product.freeShipping && (
-            <div className="flex items-center">
-              <span className="text-sm text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                Free Shipping
-              </span>
-            </div>
+            <span className="inline-block mt-1 text-xs text-green-600 font-medium bg-green-50 px-1 py-0.5 rounded">
+              Free Shipping
+            </span>
           )}
         </div>
 
         {/* Actions */}
-        <div className="space-y-3 pt-2">
-          {renderActionButton()}
-
-          {/* Compare */}
-          <div className="flex items-center space-x-2">
+        <div className="pt-2 space-y-2">
+          {getStatusButton()}
+          <label className="flex items-center space-x-1 text-xs text-gray-600 hover:text-red-600 cursor-pointer">
             <input
               type="checkbox"
-              id={`compare-${product.id}`}
-              className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+              className="w-3.5 h-3.5 text-red-600 border-gray-300 rounded focus:ring-red-500"
             />
-            <label
-              htmlFor={`compare-${product.id}`}
-              className="text-sm text-gray-600 hover:text-red-600 cursor-pointer transition-colors duration-300"
-            >
-              Add to Compare
-            </label>
-          </div>
+            <span>Add to Compare</span>
+          </label>
         </div>
       </div>
-
-      {/* Hover Overlay */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-t from-red-600/5 to-transparent pointer-events-none transition-opacity duration-300 ${
-          isHovered ? "opacity-100" : "opacity-0"
-        }`}
-      />
     </div>
   );
 };
