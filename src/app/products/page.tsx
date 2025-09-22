@@ -1,5 +1,6 @@
 "use client";
 
+import ProductFilterSidebar from "@/features/products/components/ProductFilterSidebar";
 import ProductGrid from "@/features/products/components/ProductGrid";
 import type { Product } from "@/features/products/types/product";
 
@@ -109,6 +110,7 @@ const ProductsPage = () => {
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Page Heading */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             All Products
@@ -117,7 +119,19 @@ const ProductsPage = () => {
             Discover all the products we offer.
           </p>
         </div>
-        <ProductGrid products={products} />
+
+        {/* Two-column layout */}
+        <div className="flex gap-8">
+          {/* Sidebar (sticky on desktop, collapsible on mobile) */}
+          <aside className="hidden lg:block w-80 shrink-0">
+            <ProductFilterSidebar />
+          </aside>
+
+          {/* Product grid area */}
+          <div className="flex-1">
+            <ProductGrid products={products} />
+          </div>
+        </div>
       </div>
     </section>
   );
