@@ -129,7 +129,7 @@ const ProductsPage = () => {
 
           {/* Product grid area */}
           <div className="flex-1">
-            <ProductGrid products={products} />
+            <ProductGrid products={products} columns={3} />
           </div>
         </div>
       </div>
