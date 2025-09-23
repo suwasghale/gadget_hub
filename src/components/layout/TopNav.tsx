@@ -32,6 +32,7 @@ const NavTop: React.FC<NavTopProps> = ({
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -44,7 +45,7 @@ const NavTop: React.FC<NavTopProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdown on scroll or click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -57,9 +58,20 @@ const NavTop: React.FC<NavTopProps> = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    const handleScroll = () => {
+      setIsAccountDropdownOpen(false);
+    };
+
+    if (isAccountDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('scroll', handleScroll, true);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isAccountDropdownOpen]);
 
   // Countdown timer effect
   useEffect(() => {
@@ -95,6 +107,19 @@ const NavTop: React.FC<NavTopProps> = ({
     setIsAccountDropdownOpen(!isAccountDropdownOpen);
   };
 
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsAccountDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsAccountDropdownOpen(false);
+    }, 150); // Small delay to prevent accidental closing
+  };
+
   const handleDropdownItemClick = (action: string) => {
     setIsAccountDropdownOpen(false);
     // Handle different actions here
@@ -104,10 +129,12 @@ const NavTop: React.FC<NavTopProps> = ({
   const AccountDropdown = () => (
     <div 
       ref={dropdownRef}
-      className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+      className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-[9999] overflow-hidden transform opacity-100 scale-100 transition-all duration-200 ease-out"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+      <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="text-white">
             <p className="text-sm opacity-90">Hello,</p>
@@ -115,42 +142,44 @@ const NavTop: React.FC<NavTopProps> = ({
               {isLoggedIn ? `${userName}'s Account` : 'My Account'}
             </p>
           </div>
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <User className="w-5 h-5 text-white" />
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+            <User className="w-6 h-6 text-white" />
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="py-2">
+      <div className="py-3">
         {!isLoggedIn ? (
           // Not logged in state
           <div className="px-6 py-4 space-y-3">
             <button
               onClick={() => handleDropdownItemClick('signin')}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 hover:shadow-lg hover:-translate-y-0.5"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-5 h-5" />
               <span>Sign In</span>
             </button>
             
             <button
               onClick={() => handleDropdownItemClick('signup')}
-              className="w-full border-2 border-gray-300 hover:border-red-600 text-gray-700 hover:text-red-600 font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+              className="w-full border-2 border-gray-300 hover:border-red-600 hover:bg-red-50 text-gray-700 hover:text-red-600 font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
             >
-              <UserPlus className="w-4 h-4" />
-              <span>Sign Up a Mudita Account</span>
+              <UserPlus className="w-5 h-5" />
+              <span>Create Account</span>
             </button>
           </div>
         ) : (
           // Logged in state - Account options
-          <div className="px-2">
+          <div className="px-3">
             <div className="py-2 border-b border-gray-100">
               <button
                 onClick={() => handleDropdownItemClick('profile')}
-                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 text-left"
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 rounded-xl transition-all duration-200 text-left group"
               >
-                <User className="w-5 h-5 text-gray-600" />
+                <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors duration-200">
+                  <User className="w-5 h-5 text-blue-600" />
+                </div>
                 <span className="text-gray-800 font-medium">My Profile</span>
               </button>
             </div>
@@ -158,26 +187,26 @@ const NavTop: React.FC<NavTopProps> = ({
         )}
 
         {/* Common options for both states */}
-        <div className="px-2 py-2">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="px-3 py-3">
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => handleDropdownItemClick('orders')}
-              className="flex flex-col items-center space-y-2 px-4 py-4 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+              className="flex flex-col items-center space-y-3 px-4 py-5 hover:bg-gray-50 rounded-xl transition-all duration-200 group hover:shadow-sm"
             >
-              <div className="w-12 h-12 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors duration-200">
-                <Package className="w-6 h-6 text-blue-600" />
+              <div className="w-14 h-14 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center transition-all duration-200 group-hover:scale-110">
+                <Package className="w-7 h-7 text-blue-600" />
               </div>
-              <span className="text-sm font-medium text-gray-800">My Orders</span>
+              <span className="text-sm font-semibold text-gray-800">My Orders</span>
             </button>
 
             <button
               onClick={() => handleDropdownItemClick('wishlist')}
-              className="flex flex-col items-center space-y-2 px-4 py-4 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+              className="flex flex-col items-center space-y-3 px-4 py-5 hover:bg-gray-50 rounded-xl transition-all duration-200 group hover:shadow-sm"
             >
-              <div className="w-12 h-12 bg-pink-100 group-hover:bg-pink-200 rounded-full flex items-center justify-center transition-colors duration-200">
-                <Heart className="w-6 h-6 text-pink-600" />
+              <div className="w-14 h-14 bg-pink-100 group-hover:bg-pink-200 rounded-full flex items-center justify-center transition-all duration-200 group-hover:scale-110">
+                <Heart className="w-7 h-7 text-pink-600" />
               </div>
-              <span className="text-sm font-medium text-gray-800">My Wish List</span>
+              <span className="text-sm font-semibold text-gray-800">My Wishlist</span>
             </button>
           </div>
         </div>
@@ -185,39 +214,29 @@ const NavTop: React.FC<NavTopProps> = ({
         {isLoggedIn && (
           <>
             {/* Additional logged-in options */}
-            <div className="px-2 border-t border-gray-100 pt-2">
+            <div className="px-3 border-t border-gray-100 pt-3">
               <button
                 onClick={() => handleDropdownItemClick('settings')}
-                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 text-left"
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 rounded-xl transition-all duration-200 text-left group"
               >
-                <Settings className="w-5 h-5 text-gray-600" />
-                <span className="text-gray-800">Account Settings</span>
+                <div className="w-10 h-10 bg-gray-100 group-hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors duration-200">
+                  <Settings className="w-5 h-5 text-gray-600" />
+                </div>
+                <span className="text-gray-800 font-medium">Account Settings</span>
               </button>
               
               <button
                 onClick={() => handleDropdownItemClick('logout')}
-                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-red-50 rounded-lg transition-colors duration-200 text-left text-red-600"
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-red-50 rounded-xl transition-all duration-200 text-left text-red-600 group"
               >
-                <LogOut className="w-5 h-5" />
-                <span>Sign Out</span>
+                <div className="w-10 h-10 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center transition-colors duration-200">
+                  <LogOut className="w-5 h-5 text-red-600" />
+                </div>
+                <span className="font-medium">Sign Out</span>
               </button>
             </div>
           </>
         )}
-
-        {/* Special offer section */}
-        <div className="px-6 py-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-t border-gray-100">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <Zap className="w-4 h-4 text-orange-600" />
-              <span className="text-sm font-bold text-orange-800">DASHAIN DEAL</span>
-            </div>
-            <p className="text-xs text-gray-600 mb-2">Ends in {countdown}</p>
-            <button className="text-xs bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded-full transition-colors duration-200">
-              Shop Now
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -329,17 +348,20 @@ const NavTop: React.FC<NavTopProps> = ({
                 </div>
 
                 {/* User Account with Dropdown */}
-                <div className="relative">
+                <div 
+                  className="relative"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <Button 
                     ref={buttonRef}
                     variant="ghost" 
-                    className="flex items-center gap-2 text-gray-700 hover:bg-gray-100"
-                    onClick={toggleAccountDropdown}
+                    className="flex items-center gap-2 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-xl transition-all duration-200"
                   >
                     <User className="h-5 w-5" />
                     <div className="text-left">
                       <div className="text-sm">Hello,</div>
-                      <div className="text-xs">
+                      <div className="text-xs font-medium">
                         {isLoggedIn ? userName : 'My Account'}
                       </div>
                     </div>
@@ -414,7 +436,7 @@ const NavTop: React.FC<NavTopProps> = ({
                   <span className="text-white font-bold text-sm">M</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-black">Gadget Hub</h1>
+                  <h1 className="text-xl font-bold text-black">mudita</h1>
                   <p className="text-xs text-gray-500">store</p>
                 </div>
               </div>
