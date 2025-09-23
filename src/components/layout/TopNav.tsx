@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User, Menu, X, ChevronLeft, ChevronRight, Phone, MapPin, Truck, Zap, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, ShoppingCart, User, Menu, X, ChevronLeft, ChevronRight, Phone, MapPin, Truck, Zap, HelpCircle, Package, Heart, Settings, LogOut, UserPlus, LogIn, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,8 @@ interface NavTopProps {
   onCartClick?: () => void;
   onAccountClick?: () => void;
   onMenuToggle?: () => void;
+  isLoggedIn?: boolean;
+  userName?: string;
 }
 
 const NavTop: React.FC<NavTopProps> = ({
@@ -18,12 +20,18 @@ const NavTop: React.FC<NavTopProps> = ({
   onSearch,
   onCartClick,
   onAccountClick,
-  onMenuToggle
+  onMenuToggle,
+  isLoggedIn = false,
+  userName = "John"
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [countdown, setCountdown] = useState<string>('10:13:43:21');
   const [showTopBanner, setShowTopBanner] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState<boolean>(false);
+  
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -34,6 +42,23 @@ const NavTop: React.FC<NavTopProps> = ({
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current && 
+        buttonRef.current && 
+        !dropdownRef.current.contains(event.target as Node) && 
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsAccountDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Countdown timer effect
@@ -66,6 +91,137 @@ const NavTop: React.FC<NavTopProps> = ({
     }
   };
 
+  const toggleAccountDropdown = () => {
+    setIsAccountDropdownOpen(!isAccountDropdownOpen);
+  };
+
+  const handleDropdownItemClick = (action: string) => {
+    setIsAccountDropdownOpen(false);
+    // Handle different actions here
+    console.log('Action:', action);
+  };
+
+  const AccountDropdown = () => (
+    <div 
+      ref={dropdownRef}
+      className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="text-white">
+            <p className="text-sm opacity-90">Hello,</p>
+            <p className="font-semibold text-lg">
+              {isLoggedIn ? `${userName}'s Account` : 'My Account'}
+            </p>
+          </div>
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <User className="w-5 h-5 text-white" />
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="py-2">
+        {!isLoggedIn ? (
+          // Not logged in state
+          <div className="px-6 py-4 space-y-3">
+            <button
+              onClick={() => handleDropdownItemClick('signin')}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Sign In</span>
+            </button>
+            
+            <button
+              onClick={() => handleDropdownItemClick('signup')}
+              className="w-full border-2 border-gray-300 hover:border-red-600 text-gray-700 hover:text-red-600 font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Sign Up a Mudita Account</span>
+            </button>
+          </div>
+        ) : (
+          // Logged in state - Account options
+          <div className="px-2">
+            <div className="py-2 border-b border-gray-100">
+              <button
+                onClick={() => handleDropdownItemClick('profile')}
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 text-left"
+              >
+                <User className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-800 font-medium">My Profile</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Common options for both states */}
+        <div className="px-2 py-2">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleDropdownItemClick('orders')}
+              className="flex flex-col items-center space-y-2 px-4 py-4 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+            >
+              <div className="w-12 h-12 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors duration-200">
+                <Package className="w-6 h-6 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-800">My Orders</span>
+            </button>
+
+            <button
+              onClick={() => handleDropdownItemClick('wishlist')}
+              className="flex flex-col items-center space-y-2 px-4 py-4 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+            >
+              <div className="w-12 h-12 bg-pink-100 group-hover:bg-pink-200 rounded-full flex items-center justify-center transition-colors duration-200">
+                <Heart className="w-6 h-6 text-pink-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-800">My Wish List</span>
+            </button>
+          </div>
+        </div>
+
+        {isLoggedIn && (
+          <>
+            {/* Additional logged-in options */}
+            <div className="px-2 border-t border-gray-100 pt-2">
+              <button
+                onClick={() => handleDropdownItemClick('settings')}
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 text-left"
+              >
+                <Settings className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-800">Account Settings</span>
+              </button>
+              
+              <button
+                onClick={() => handleDropdownItemClick('logout')}
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-red-50 rounded-lg transition-colors duration-200 text-left text-red-600"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Special offer section */}
+        <div className="px-6 py-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-t border-gray-100">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <Zap className="w-4 h-4 text-orange-600" />
+              <span className="text-sm font-bold text-orange-800">DASHAIN DEAL</span>
+            </div>
+            <p className="text-xs text-gray-600 mb-2">Ends in {countdown}</p>
+            <button className="text-xs bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded-full transition-colors duration-200">
+              Shop Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full">
       {/* Desktop Version */}
@@ -75,9 +231,9 @@ const NavTop: React.FC<NavTopProps> = ({
           <div className="bg-gradient-to-r from-red-600 to-red-500 text-white relative">
             <div className="max-w-7xl mx-auto px-4 py-2">
               <div className="flex items-center justify-between">
-              <div className="text-white text-sm font-medium">
-                Dream. Dare. Inspire.
-              </div>
+                <div className="text-white text-sm font-medium">
+                  Dream. Dare. Inspire.
+                </div>
 
                 <Button 
                   variant="ghost" 
@@ -172,19 +328,26 @@ const NavTop: React.FC<NavTopProps> = ({
                   </div>
                 </div>
 
-                {/* User Account */}
-                <Button 
-                  variant="ghost" 
-                  className="flex items-center gap-2 text-gray-700"
-                  onClick={onAccountClick}
-                >
-                  <User className="h-5 w-5" />
-                  <div className="text-left">
-                    <div className="text-sm">Hello,</div>
-                    <div className="text-xs">My Account</div>
-                  </div>
-                  <ChevronRight className="h-3 w-3" />
-                </Button>
+                {/* User Account with Dropdown */}
+                <div className="relative">
+                  <Button 
+                    ref={buttonRef}
+                    variant="ghost" 
+                    className="flex items-center gap-2 text-gray-700 hover:bg-gray-100"
+                    onClick={toggleAccountDropdown}
+                  >
+                    <User className="h-5 w-5" />
+                    <div className="text-left">
+                      <div className="text-sm">Hello,</div>
+                      <div className="text-xs">
+                        {isLoggedIn ? userName : 'My Account'}
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isAccountDropdownOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+
+                  {isAccountDropdownOpen && <AccountDropdown />}
+                </div>
 
                 {/* Cart */}
                 <Button 
@@ -251,7 +414,7 @@ const NavTop: React.FC<NavTopProps> = ({
                   <span className="text-white font-bold text-sm">M</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-black">mudita</h1>
+                  <h1 className="text-xl font-bold text-black">Gadget Hub</h1>
                   <p className="text-xs text-gray-500">store</p>
                 </div>
               </div>
@@ -261,6 +424,8 @@ const NavTop: React.FC<NavTopProps> = ({
                 <Button variant="ghost" size="sm" className="p-2">
                   <HelpCircle className="h-6 w-6 text-gray-600" />
                 </Button>
+                
+                {/* Mobile Account with Simple Tap */}
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -269,6 +434,7 @@ const NavTop: React.FC<NavTopProps> = ({
                 >
                   <User className="h-6 w-6 text-gray-600" />
                 </Button>
+                
                 <Button 
                   variant="ghost" 
                   size="sm" 
