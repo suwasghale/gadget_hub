@@ -50,3 +50,21 @@ export async function apiFetch<T = any>(
 
   return response.json() as Promise<T>;
 }
+
+
+async function refreshAccessToken(refresh: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/users/token/refresh/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh }),
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return data.access;
+  } catch {
+    return null;
+  }
+}
