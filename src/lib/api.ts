@@ -1,18 +1,17 @@
 export interface FetchOptions extends RequestInit {
-  auth?: boolean; // whether to include JWT token
+  auth?: boolean;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1/";
+const API_V1 = process.env.NEXT_PUBLIC_API_V1_URL || "http://127.0.0.1:8000/api/v1";
+const API_ROOT = process.env.NEXT_PUBLIC_API_ROOT_URL || "http://127.0.0.1:8000";
 
 export async function apiFetch<T = any>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const token =
+  const access =
     typeof window !== "undefined" ? localStorage.getItem("access") : null;
 
-  // ✅ Ensure headers is a mutable object (not a tuple array)
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options.headers instanceof Headers
@@ -20,33 +19,44 @@ export async function apiFetch<T = any>(
       : (options.headers as Record<string, string> || {})),
   };
 
-  if (options.auth && token) {
-    headers["Authorization"] = `Bearer ${token}`;
+  if (options.auth && access) {
+    headers.Authorization = `Bearer ${access}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_V1}/${endpoint}`, {
     ...options,
     headers,
   });
 
-  if (response.status === 401 && token) {
-    // attempt refresh token
+  // 🔁 Handle expired access token
+  if (response.status === 401 && options.auth) {
     const refresh = localStorage.getItem("refresh");
     if (refresh) {
       const newAccess = await refreshAccessToken(refresh);
       if (newAccess) {
         localStorage.setItem("access", newAccess);
-        return apiFetch(endpoint, options); // retry once
+        headers.Authorization = `Bearer ${newAccess}`;
+
+        const retry = await fetch(`${API_V1}/${endpoint}`, {
+          ...options,
+          headers,
+        });
+
+        if (!retry.ok) {
+          throw new Error(await retry.text());
+        }
+
+        return retry.json();
       }
     }
   }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`API Error: ${response.status} - ${error}`);
+    const errorText = await response.text();
+    throw new Error(errorText || `Request failed with ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  return response.json();
 }
 
 
