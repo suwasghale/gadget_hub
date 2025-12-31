@@ -147,53 +147,75 @@
 import { useEffect, useState } from "react";
 import ProductFilterSidebar from "@/features/products/components/ProductFilterSidebar";
 import ProductGrid from "@/features/products/components/ProductGrid";
-import type { Product } from "@/features/products/types/product";
 import { fetchProducts } from "@/features/products/api/products";
+import type { Product } from "@/features/products/types/product";
 
-const ProductsPage = () => {
+const PAGE_SIZE = 9;
+
+export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchProducts()
-      .then(setProducts)
-      .catch(() => setError("Failed to load products"))
+    setLoading(true);
+
+    fetchProducts(page)
+      .then((data) => {
+        setProducts(data.results);
+        setCount(data.count);
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [page]);
 
-  if (loading) {
-    return <p className="text-center py-20">Loading products...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center py-20 text-red-500">{error}</p>;
-  }
+  const totalPages = Math.ceil(count / PAGE_SIZE);
 
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
+
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            All Products
-          </h2>
-          <p className="text-gray-600">
-            Discover all the products we offer.
-          </p>
+          <h2 className="text-3xl font-bold">All Products</h2>
         </div>
 
         <div className="flex gap-8">
-          <aside className="hidden lg:block w-80 shrink-0">
+          <aside className="hidden lg:block w-80">
             <ProductFilterSidebar />
           </aside>
 
           <div className="flex-1">
-            <ProductGrid products={products} columns={3} />
+            {loading ? (
+              <p>Loading…</p>
+            ) : (
+              <>
+                <ProductGrid products={products} columns={3} />
+
+                {/* Pagination */}
+                <div className="flex justify-center mt-8 gap-4">
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage((p) => p - 1)}
+                  >
+                    Previous
+                  </button>
+
+                  <span>
+                    Page {page} of {totalPages}
+                  </span>
+
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default ProductsPage;
+}
