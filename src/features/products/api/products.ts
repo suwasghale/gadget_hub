@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api";
 import type { Product } from "../types/product";
+import type { PaginatedResponse } from "@/features/products/types/product";
 
 /* Backend response shape */
 interface ProductAPI {
@@ -10,14 +11,6 @@ interface ProductAPI {
   image: string | null;
   is_active: boolean;
   created_at: string;
-}
-
-/* Paginated response */
-interface PaginatedResponse<T> {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
 }
 
 /* Map backend → frontend */
@@ -40,18 +33,28 @@ function mapProduct(api: ProductAPI): Product {
     originalPrice: original,
     discount,
     status: api.is_active ? "in-stock" : "out-of-stock",
-    isNew: false, // you can compute later
+    isNew: false,
     freeShipping: true,
-    rating: 4.5, // temporary
-    reviewCount: 0,
+    rating: 4.5,      // temporary
+    reviewCount: 0,   // temporary
   };
 }
 
-/* Fetch products */
-export async function fetchProducts(): Promise<Product[]> {
+/* PAGE SIZE */
+const PAGE_SIZE = 9;
+
+/* Fetch paginated products */
+export async function fetchProducts(page = 1) {
+  const offset = (page - 1) * PAGE_SIZE;
+
   const data = await apiFetch<PaginatedResponse<ProductAPI>>(
-    "products/"
+    `products/?limit=${PAGE_SIZE}&offset=${offset}`
   );
 
-  return data.results.map(mapProduct);
+  return {
+    count: data.count,
+    next: data.next,
+    previous: data.previous,
+    results: data.results.map(mapProduct),
+  };
 }
