@@ -145,6 +145,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import ProductFilterSidebar from "@/features/products/components/ProductFilterSidebar";
 import ProductGrid from "@/features/products/components/ProductGrid";
 import { fetchProducts } from "@/features/products/api/products";
@@ -153,23 +155,33 @@ import type { Product } from "@/features/products/types/product";
 const PAGE_SIZE = 9;
 
 export default function ProductsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const pageParam = Number(searchParams.get("page")) || 1;
+
   const [products, setProducts] = useState<Product[]>([]);
   const [count, setCount] = useState(0);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
 
-    fetchProducts(page)
+    fetchProducts(pageParam)
       .then((data) => {
         setProducts(data.results);
         setCount(data.count);
       })
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [pageParam]);
 
   const totalPages = Math.ceil(count / PAGE_SIZE);
+
+  function goToPage(page: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    router.push(`?${params.toString()}`);
+  }
 
   return (
     <section className="py-12 bg-gray-50">
@@ -192,21 +204,21 @@ export default function ProductsPage() {
                 <ProductGrid products={products} columns={3} />
 
                 {/* Pagination */}
-                <div className="flex justify-center mt-8 gap-4">
+                <div className="flex justify-center items-center gap-4 mt-8">
                   <button
-                    disabled={page === 1}
-                    onClick={() => setPage((p) => p - 1)}
+                    disabled={pageParam === 1}
+                    onClick={() => goToPage(pageParam - 1)}
                   >
                     Previous
                   </button>
 
                   <span>
-                    Page {page} of {totalPages}
+                    Page {pageParam} of {totalPages}
                   </span>
 
                   <button
-                    disabled={page === totalPages}
-                    onClick={() => setPage((p) => p + 1)}
+                    disabled={pageParam === totalPages}
+                    onClick={() => goToPage(pageParam + 1)}
                   >
                     Next
                   </button>
@@ -219,3 +231,4 @@ export default function ProductsPage() {
     </section>
   );
 }
+
