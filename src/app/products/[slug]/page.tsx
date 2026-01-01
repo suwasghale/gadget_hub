@@ -6,7 +6,6 @@ import {
   Share2, 
   Truck, 
   Store, 
-  Shield, 
   ChevronLeft, 
   ChevronRight,
   Plus,
