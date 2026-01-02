@@ -1,19 +1,28 @@
 import { apiFetch } from "@/lib/api";
 import type { Product } from "../types/product";
-import type { PaginatedResponse } from "@/features/products/types/product";
 
-/* Backend response shape */
 interface ProductAPI {
   id: number;
   name: string;
   price: string;
   original_price: string | null;
   image: string | null;
-  is_active: boolean;
-  created_at: string;
+  is_available: boolean;
 }
 
-/* Map backend → frontend */
+interface PaginatedResponse<T> {
+  count: number;
+  results: T[];
+}
+
+export interface ProductFilters {
+  page?: number;
+  brand?: string;
+  min_price?: number;
+  max_price?: number;
+  q?: string;
+}
+
 function mapProduct(api: ProductAPI): Product {
   const price = Number(api.price);
   const original = api.original_price
@@ -32,29 +41,27 @@ function mapProduct(api: ProductAPI): Product {
     currentPrice: price,
     originalPrice: original,
     discount,
-    status: api.is_active ? "in-stock" : "out-of-stock",
-    isNew: false,
-    freeShipping: true,
-    rating: 4.5,      // temporary
-    reviewCount: 0,   // temporary
+    status: api.is_available ? "in-stock" : "out-of-stock",
   };
 }
 
-/* PAGE SIZE */
-const PAGE_SIZE = 9;
+export async function fetchProducts(
+  filters: ProductFilters
+): Promise<PaginatedResponse<Product>> {
+  const params = new URLSearchParams();
 
-/* Fetch paginated products */
-export async function fetchProducts(page = 1) {
-  const offset = (page - 1) * PAGE_SIZE;
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") {
+      params.append(key, String(value));
+    }
+  });
 
   const data = await apiFetch<PaginatedResponse<ProductAPI>>(
-    `products/?limit=${PAGE_SIZE}&offset=${offset}`
+    `products/?${params.toString()}`
   );
 
   return {
     count: data.count,
-    next: data.next,
-    previous: data.previous,
     results: data.results.map(mapProduct),
   };
 }
